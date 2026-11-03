@@ -1,0 +1,47 @@
+# ---------- Java / Maven ----------
+backend/target/
+*.class
+*.log
+hs_err_pid*
+!.mvn/wrapper/maven-wrapper.jar
+
+# ---------- Node / Angular ----------
+node_modules/
+frontend/dist/
+frontend/.angular/
+npm-debug.log*
+yarn-error.log*
+
+# ---------- Playwright ----------
+pruebas/e2e/test-results/
+pruebas/e2e/playwright-report/
+pruebas/e2e/blob-report/
+pruebas/e2e/playwright/.cache/
+
+# ---------- IDE ----------
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# ---------- Sistema operativo ----------
+.DS_Store
+Thumbs.db
+
+# ---------- Secretos y configuración local (nunca versionar) ----------
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.yaml
+application-local.properties
+*.pem
+*.key
+*.p12
+*.jks
+
+# ---------- Archivos generados en ejecución ----------
+archivos-subidos/
