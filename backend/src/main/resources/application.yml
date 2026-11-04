@@ -1,8 +1,39 @@
 spring:
   application:
     name: bankbatch
+
+  config:
+    import: optional:file:../.env[.properties]
+
+  datasource:
+    url: ${BANKBATCH_BD_URL}
+    username: ${BANKBATCH_BD_USUARIO}
+    password: ${BANKBATCH_BD_CLAVE}
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    enabled: true
+    url: ${BANKBATCH_BD_URL}
+    user: ${BANKBATCH_FLYWAY_USUARIO}
+    password: ${BANKBATCH_FLYWAY_CLAVE}
+    locations: classpath:db/migration
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  batch:
+    jdbc:
+      initialize-schema: never
+
 server:
   port: 8080
+
 management:
   endpoints:
     web:
