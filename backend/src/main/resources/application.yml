@@ -39,3 +39,9 @@ management:
     web:
       exposure:
         include: health
+
+bankbatch:
+  seguridad:
+    jwt:
+      secreto: ${BANKBATCH_JWT_SECRETO}
+      duracion: 15m
