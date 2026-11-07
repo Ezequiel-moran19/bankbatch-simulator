@@ -35,6 +35,7 @@ public class ConfiguracionSeguridad {
                 .authorizeHttpRequests(reglas -> reglas
                         .requestMatchers(HttpMethod.POST, "/api/autenticacion/inicio-sesion").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwt -> jwt
