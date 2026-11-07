@@ -25,6 +25,11 @@ public class Rol {
     protected Rol() {
     }
 
+    public Rol(String nombre, String descripcion) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+    }
+
     public Long getId() {
         return id;
     }
