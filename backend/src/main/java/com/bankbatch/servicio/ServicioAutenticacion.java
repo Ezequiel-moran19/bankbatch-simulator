@@ -35,6 +35,9 @@ public class ServicioAutenticacion {
 
     @Transactional
     public RespuestaAutenticacion iniciarSesion(SolicitudInicioSesion solicitud) {
+        if (ValidadorContrasena.excedeElLimite(solicitud.contrasena())) {
+            throw new CredencialesInvalidasExcepcion();
+        }
         String nombreUsuario = solicitud.nombreUsuario().strip().toLowerCase(Locale.ROOT);
         Optional<Usuario> encontrado = repositorioUsuarios.findByNombreUsuario(nombreUsuario);
 
