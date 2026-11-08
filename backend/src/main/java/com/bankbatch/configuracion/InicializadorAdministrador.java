@@ -23,10 +23,7 @@ public class InicializadorAdministrador implements ApplicationRunner, Environmen
     private final PasswordEncoder codificadorContrasenas;
     private Environment entorno;
 
-    public InicializadorAdministrador(
-            RepositorioUsuarios repositorioUsuarios,
-            RepositorioRoles repositorioRoles,
-            PasswordEncoder codificadorContrasenas) {
+    public InicializadorAdministrador(RepositorioUsuarios repositorioUsuarios, RepositorioRoles repositorioRoles, PasswordEncoder codificadorContrasenas) {
         this.repositorioUsuarios = repositorioUsuarios;
         this.repositorioRoles = repositorioRoles;
         this.codificadorContrasenas = codificadorContrasenas;
@@ -47,8 +44,7 @@ public class InicializadorAdministrador implements ApplicationRunner, Environmen
         String contrasena = entorno.getProperty("BANKBATCH_ADMIN_CLAVE_INICIAL");
 
         if (!StringUtils.hasText(contrasena)) {
-            throw new IllegalStateException(
-                    "No se puede crear el administrador: falta BANKBATCH_ADMIN_CLAVE_INICIAL.");
+            throw new IllegalStateException("No se puede crear el administrador: falta BANKBATCH_ADMIN_CLAVE_INICIAL.");
         }
 
         String nombreUsuario = entorno.getProperty(
@@ -57,13 +53,11 @@ public class InicializadorAdministrador implements ApplicationRunner, Environmen
                 "BANKBATCH_ADMIN_CORREO", "admin@bankbatch.local");
 
         if (!StringUtils.hasText(nombreUsuario) || !StringUtils.hasText(correo)) {
-            throw new IllegalStateException(
-                    "El nombre de usuario y el correo del administrador son obligatorios.");
+            throw new IllegalStateException("El nombre de usuario y el correo del administrador son obligatorios.");
         }
 
         Rol rolAdministrador = repositorioRoles.findByNombre("ADMINISTRADOR")
-                .orElseThrow(() -> new IllegalStateException(
-                        "No existe el rol ADMINISTRADOR en la base de datos."));
+                .orElseThrow(() -> new IllegalStateException("No existe el rol ADMINISTRADOR en la base de datos."));
 
         Usuario administrador = new Usuario(
                 "Administrador",

@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 @Entity
@@ -64,8 +65,8 @@ public class Usuario {
     public Usuario(String nombre, String apellido, String correo, String nombreUsuario, String contrasenaHash) {
         this.nombre = nombre;
         this.apellido = apellido;
-        this.correo = correo;
-        this.nombreUsuario = nombreUsuario;
+        this.correo = correo.strip().toLowerCase(Locale.ROOT);
+        this.nombreUsuario = nombreUsuario.strip().toLowerCase(Locale.ROOT);
         this.contrasenaHash = contrasenaHash;
         this.estado = EstadoUsuario.ACTIVO;
         this.fechaCreacion = Instant.now();
