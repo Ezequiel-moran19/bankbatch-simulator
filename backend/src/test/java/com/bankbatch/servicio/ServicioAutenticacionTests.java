@@ -124,4 +124,11 @@ class ServicioAutenticacionTests {
         assertThat(usuario.getUltimoAcceso()).isNull();
         verify(repositorioUsuarios, never()).save(any());
     }
+    @Test
+    void rechazaUnaContrasenaDeMasDe72Bytes() {
+        assertThatThrownBy(() -> servicio.iniciarSesion(new SolicitudInicioSesion("ana", "a".repeat(73))))
+            .isInstanceOf(CredencialesInvalidasExcepcion.class);
+
+        verify(repositorioUsuarios, never()).save(any());
+    }
 }

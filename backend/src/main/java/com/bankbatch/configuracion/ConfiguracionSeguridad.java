@@ -25,28 +25,40 @@ import java.util.List;
 public class ConfiguracionSeguridad {
 
     @Bean
-    public SecurityFilterChain cadenaDeSeguridad(HttpSecurity http,
-                                                 JwtDecoder decodificador,
-                                                 ConvertidorAutenticacionJwt convertidor) throws Exception {
+    public SecurityFilterChain cadenaDeSeguridad(
+        HttpSecurity http,
+        JwtDecoder decodificador,
+        ConvertidorAutenticacionJwt convertidor,
+        RespuestasSeguridadJson respuestasSeguridadJson) throws Exception {
+
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .sessionManagement(sesion -> sesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(reglas -> reglas
-                        .requestMatchers(HttpMethod.POST, "/api/autenticacion/inicio-sesion").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth -> oauth
-                        .jwt(jwt -> jwt
-                                .decoder(decodificador)
-                                .jwtAuthenticationConverter(convertidor)));
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(Customizer.withDefaults())
+            .sessionManagement(sesion ->
+                sesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(excepciones -> excepciones
+                .authenticationEntryPoint(respuestasSeguridadJson)
+                .accessDeniedHandler(respuestasSeguridadJson))
+            .authorizeHttpRequests(reglas -> reglas
+                .requestMatchers(HttpMethod.POST, "/api/autenticacion/inicio-sesion").permitAll()
+                .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
+                .requestMatchers("/error").permitAll()
+                .anyRequest().authenticated())
+            .oauth2ResourceServer(oauth -> oauth
+                .jwt(jwt -> jwt
+                    .decoder(decodificador)
+                    .jwtAuthenticationConverter(convertidor))
+                .authenticationEntryPoint(respuestasSeguridadJson)
+                .accessDeniedHandler(respuestasSeguridadJson));
+
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource fuenteCors(
-            @Value("${bankbatch.seguridad.cors.origenes-permitidos:http://localhost:4200}") List<String> origenes) {
+        @Value("${bankbatch.seguridad.cors.origenes-permitidos:http://localhost:4200}")
+        List<String> origenes) {
+
         CorsConfiguration configuracion = new CorsConfiguration();
         configuracion.setAllowedOrigins(origenes);
         configuracion.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
@@ -55,6 +67,7 @@ public class ConfiguracionSeguridad {
 
         UrlBasedCorsConfigurationSource fuente = new UrlBasedCorsConfigurationSource();
         fuente.registerCorsConfiguration("/api/**", configuracion);
+
         return fuente;
     }
 }
