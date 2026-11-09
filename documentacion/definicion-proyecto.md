@@ -2,7 +2,7 @@
 
 **Documento de definición y planificación del proyecto**
 
-**Versión:** 1.5 (definitiva, base para iniciar el desarrollo; motor PostgreSQL) **Tipo:** Aplicación web Full Stack **Dominio:** Simulación de procesos batch bancarios con datos ficticios **Finalidad:** Proyecto de portfolio profesional y demostración de conocimientos de desarrollo, bases de datos y testing
+**Versión:** 1.5 (definitiva; motor PostgreSQL; estado de avance actualizado el 09/11/2026 en el Anexo C) **Tipo:** Aplicación web Full Stack **Dominio:** Simulación de procesos batch bancarios con datos ficticios **Finalidad:** Proyecto de portfolio profesional y demostración de conocimientos de desarrollo, bases de datos y testing
 
 Este documento consolida y reemplaza las versiones 1.0 a 1.4. Las decisiones tomadas durante la consolidación figuran en el Anexo A.
 
@@ -585,3 +585,63 @@ El motor de base de datos pasa de SQL Server a **PostgreSQL 18** (instalación l
 | Script de metadatos de Spring Batch | Script oficial de PostgreSQL de la versión elegida, como migración Flyway |
 
 La auditoría append-only se logra quitando UPDATE y DELETE sobre auditoria al rol de la aplicación, en una migración.
+
+## Anexo C. Estado de avance al 09/11/2026
+
+Este anexo registra qué se hizo y qué falta respecto del plan de 18 etapas de la sección 16. La definición funcional y técnica de este documento no cambia: es la fuente de verdad.
+
+### C.1. Estado por etapa
+
+| Etapa | Descripción | Estado |
+| --- | --- | --- |
+| 1 | Repositorio, Git y GitHub | Completada e integrada en develop |
+| 2 | Java 21, Maven y Spring Boot | Completada e integrada |
+| 3 | PostgreSQL y Flyway | Completada e integrada |
+| 4 | Modelo de datos y migraciones | Completada e integrada (V1 a V9) |
+| 5 | Seguridad y autenticación | Completada y validada; la rama y las migraciones V10 están pendientes de integrar en develop |
+| 6 | Clientes y cuentas, bajas lógicas y auditoría | Pendiente |
+| 7 | Servicios, transacciones y concurrencia | Pendiente |
+| 8 | Angular: login, dashboard, clientes y cuentas | Pendiente |
+| 9 | Proceso de acreditación | Pendiente |
+| 10 | Proceso de débitos | Pendiente |
+| 11 | Proceso de conciliación | Pendiente |
+| 12 | Idempotencia, recuperación de ejecuciones y reportes | Pendiente |
+| 13 | Angular: procesos, ejecuciones, conciliaciones, usuarios y auditoría | Pendiente |
+| 14 | Consolidación de pruebas unitarias e integración | Pendiente |
+| 15 | Postman | En curso: colección con las carpetas 00 y 01 validadas |
+| 16 | Playwright | Pendiente |
+| 17 | GitHub Actions | Pendiente |
+| 18 | Documentación final | En curso: seguridad, decisiones del modelo y este anexo |
+
+### C.2. Lo realizado
+
+- Repositorio con ramas main y develop, plantilla de Pull Request y archivos de configuración.
+- Backend con Java 21, Spring Boot 4.1.2 y Maven Wrapper; PostgreSQL 18.6 con Flyway.
+- Diez migraciones: V1 usuarios y roles; V2 clientes y cuentas; V3 procesos y ejecuciones; V4 movimientos, registros y conciliaciones; V5 auditoría; V6 tablas de Spring Batch 6.0.6; V7 roles y procesos iniciales; V8 movimientos sin UPDATE ni DELETE para la aplicación; V9 integridad de períodos y conciliaciones; V10 usuarios y correos en minúsculas.
+- Autenticación JWT HS256 de 15 minutos, contraseñas con BCrypt (máximo 72 bytes), usuario y roles consultados en la base en cada solicitud, administrador inicial en el perfil dev, API sin sesiones, CORS para Angular y errores 400, 401 y 403 con estructura JSON común.
+- 49 pruebas automatizadas aprobadas.
+- Colección de Postman con las carpetas 00 - Verificacion y 01 - Autenticacion validadas contra el backend real.
+- Documentación: seguridad (documentacion/arquitectura/seguridad.md) y decisiones del modelo (documentacion/modelo-datos/decisiones-modelo.md).
+
+### C.3. Lo que falta
+
+- Gestión de clientes y cuentas con bajas lógicas y auditoría de acciones.
+- Gestión de usuarios y roles (solo ADMINISTRADOR) y permisos por rol en cada recurso, según la matriz de la sección 5.2.
+- Servicios transaccionales con bloqueo optimista de cuentas.
+- Los tres procesos batch, con idempotencia por hash de archivo, una sola ejecución EN\_CURSO por proceso y recuperación de ejecuciones interrumpidas.
+- Consulta de movimientos, ejecuciones, registros procesados, conciliaciones, dashboard y auditoría.
+- Frontend Angular completo.
+- Pruebas de API (resto de la colección), pruebas E2E con Playwright e integración continua.
+- Documentación final y cierre del portfolio.
+
+### C.4. Decisiones tomadas durante la implementación
+
+| Tema | Decisión |
+| --- | --- |
+| Emisión y validación del JWT | Nimbus, incluida en Spring Security, con HS256 explícito y sin tolerancia de reloj |
+| Administrador inicial | Componente de arranque en el perfil dev, solo si no existen usuarios; la contraseña inicial viene de BANKBATCH\_ADMIN\_CLAVE\_INICIAL |
+| Respuesta de login fallido | Misma respuesta 401 para usuario inexistente, contraseña incorrecta y usuario no activo; hash ficticio para igualar tiempos |
+| Usuarios y correos | Minúsculas garantizadas por la entidad y por la migración V10 |
+| Estructura de errores | fecha, estado, error, mensaje, ruta y detalles |
+| Colección de Postman | Se guarda en pruebas/postman sin tokens ni contraseñas |
+| Ritmo de trabajo | Cada iteración entrega un módulo completo: código, pruebas, solicitudes de Postman y un único commit |
