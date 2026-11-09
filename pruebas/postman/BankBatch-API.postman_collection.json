@@ -1,0 +1,253 @@
+{
+  "info": {
+    "_postman_id": "cddf7f63-35e9-44a3-a7d1-e22dc538efdb",
+    "name": "BankBatch - API",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "60026315",
+    "_collection_link": "https://go.postman.co/collection/60026315-cddf7f63-35e9-44a3-a7d1-e22dc538efdb?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Autenticacion",
+      "item": [
+        {
+          "name": "api/autenticacion/perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\n\nconst cuerpo = pm.response.json();\n\npm.test(\"Devuelve los datos del administrador\", () => {\n    pm.expect(cuerpo.nombreUsuario).to.eql(\"admin\");\n    pm.expect(cuerpo.roles).to.include(\"ADMINISTRADOR\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url_base}}/api/autenticacion/perfil",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "autenticacion",
+                "perfil"
+              ]
+            },
+            "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+          },
+          "response": []
+        },
+        {
+          "name": "api/autenticacion/perfil-perfil-sin-token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 401\", () => pm.response.to.have.status(401));\n\npm.test(\"Pide autenticacion Bearer y usa JSON\", () => {\n    pm.expect(pm.response.headers.get(\"WWW-Authenticate\")).to.eql(\"Bearer\");\n    pm.expect(pm.response.json().error).to.eql(\"No autenticado\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": ""
+              }
+            ],
+            "url": {
+              "raw": "{{url_base}}/api/autenticacion/perfil",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "autenticacion",
+                "perfil"
+              ]
+            },
+            "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+          },
+          "response": []
+        },
+        {
+          "name": "api/autenticacion/inicio-sesion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\n\nconst cuerpo = pm.response.json();\n\npm.test(\"Devuelve un token de tipo Bearer\", () => {\n    pm.expect(cuerpo.token).to.be.a(\"string\").and.not.empty;\n    pm.expect(cuerpo.tipo).to.eql(\"Bearer\");\n});\n\npm.test(\"Incluye el rol ADMINISTRADOR\", () => {\n    pm.expect(cuerpo.roles).to.include(\"ADMINISTRADOR\");\n});\n\npm.environment.set(\"token\", cuerpo.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombreUsuario\":\"admin\",\n    \"contrasena\":\"{{contrasena_admin}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/autenticacion/inicio-sesion",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "autenticacion",
+                "inicio-sesion"
+              ]
+            },
+            "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+          },
+          "response": []
+        },
+        {
+          "name": "api/autenticacion/inicio-sesion-contrasenaincorrecta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 401\", () => pm.response.to.have.status(401));\n\npm.test(\"Usa la estructura de error comun\", () => {\n    const cuerpo = pm.response.json();\n    pm.expect(cuerpo.estado).to.eql(401);\n    pm.expect(cuerpo.error).to.eql(\"No autenticado\");\n    pm.expect(cuerpo.mensaje).to.eql(\"Credenciales inválidas\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombreUsuario\":\"admin\",\n    \"contrasena\":\"incorrecta\"\n}\t",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/autenticacion/inicio-sesion",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "autenticacion",
+                "inicio-sesion"
+              ]
+            },
+            "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+          },
+          "response": []
+        },
+        {
+          "name": "api/autenticacion/inicio-sesion-vacio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));\n\npm.test(\"Informa los dos campos obligatorios\", () => {\n    const cuerpo = pm.response.json();\n    pm.expect(cuerpo.error).to.eql(\"Solicitud incorrecta\");\n    pm.expect(cuerpo.detalles).to.have.lengthOf(2);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}\t",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/autenticacion/inicio-sesion",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "autenticacion",
+                "inicio-sesion"
+              ]
+            },
+            "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Verificacion",
+      "item": [
+        {
+          "name": "api/actuator/health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\n\r\npm.test(\"El estado es UP\", () => pm.expect(pm.response.json().status).to.eql(\"UP\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/actuator/health",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "url_base",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "secret": true
+    }
+  ]
+}

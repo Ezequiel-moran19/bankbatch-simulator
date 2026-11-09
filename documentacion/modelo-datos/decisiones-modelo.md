@@ -15,7 +15,9 @@ Registro de las decisiones tomadas al implementar las migraciones V1 a V9. Compl
 | Permisos de bankbatch_app | Auditoría append-only; movimientos históricos | auditoria y movimientos: solo SELECT e INSERT (V5 y V8). Resto: DML completo por defecto | Auditoría y movimientos no se modifican ni eliminan |
 | Período de ejecución | Obligatorio solo en conciliación | CHECK: ambos períodos juntos o ambos nulos, con hasta >= desde (V9) | Un CHECK no puede consultar el tipo de proceso; esa regla la valida el servicio |
 | Resultados de conciliación | Seis resultados posibles | CHECK de coherencia entre resultado e importes (V9) | Evita filas inconsistentes |
-| Administrador inicial | Se carga con BANKBATCH_ADMIN_CLAVE_INICIAL | No hay usuarios ni contraseñas en las migraciones; el mecanismo se define en la Etapa 5 | La contraseña nunca se versiona |
+| Administrador inicial | Se carga con BANKBATCH_ADMIN_CLAVE_INICIAL | No hay usuarios ni contraseñas en las migraciones; lo crea un componente de arranque en el perfil dev, solo si la tabla usuarios está vacía (Etapa 5) | La contraseña nunca se versiona |
+| Usuarios en minúsculas | No definido | CHECK sobre nombre_usuario y correo (V10) y normalización en la entidad | Evita duplicados por mayúsculas y coincide con la búsqueda del login |
+| Contraseñas | Hash BCrypt | Se rechazan las de más de 72 bytes en UTF-8 | BCrypt ignora los bytes posteriores al 72 |
 
 ## Verificación
 
