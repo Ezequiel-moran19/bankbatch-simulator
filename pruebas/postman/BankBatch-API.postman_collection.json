@@ -29,7 +29,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "{{bearer_token_120z}}"
+                "value": "{{token}}"
               }
             ],
             "url": {
@@ -101,7 +101,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"nombreUsuario\":\"admin\",\n    \"contrasena\":\"pruebatest\"\n}",
+              "raw": "{\n    \"nombreUsuario\":\"admin\",\n    \"contrasena\":\"{{contrasena_admin}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -246,7 +246,7 @@
       "value": ""
     },
     {
-      "key": "bearer_token_120z",
+      "key": "token",
       "secret": true
     }
   ]
