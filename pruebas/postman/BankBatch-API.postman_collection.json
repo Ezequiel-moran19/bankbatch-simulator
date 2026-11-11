@@ -12,7 +12,7 @@
       "name": "Autenticacion",
       "item": [
         {
-          "name": "api/autenticacion/perfil",
+          "name": "Consultar perfil",
           "event": [
             {
               "listen": "test",
@@ -29,7 +29,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "{{token}}"
+                "value": "{{bearer_token_120z}}"
               }
             ],
             "url": {
@@ -48,7 +48,7 @@
           "response": []
         },
         {
-          "name": "api/autenticacion/perfil-perfil-sin-token",
+          "name": "Consultar perfil sin token",
           "event": [
             {
               "listen": "test",
@@ -84,14 +84,14 @@
           "response": []
         },
         {
-          "name": "api/autenticacion/inicio-sesion",
+          "name": "Iniciar sesion",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\n\nconst cuerpo = pm.response.json();\n\npm.test(\"Devuelve un token de tipo Bearer\", () => {\n    pm.expect(cuerpo.token).to.be.a(\"string\").and.not.empty;\n    pm.expect(cuerpo.tipo).to.eql(\"Bearer\");\n});\n\npm.test(\"Incluye el rol ADMINISTRADOR\", () => {\n    pm.expect(cuerpo.roles).to.include(\"ADMINISTRADOR\");\n});\n\npm.environment.set(\"token\", cuerpo.token);"
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\n\nconst cuerpo = pm.response.json();\n\npm.test(\"Devuelve un token de tipo Bearer\", () => {\n    pm.expect(cuerpo.token).to.be.a(\"string\").and.not.empty;\n    pm.expect(cuerpo.tipo).to.eql(\"Bearer\");\n});\n\npm.test(\"Incluye el rol ADMINISTRADOR\", () => {\n    pm.expect(cuerpo.roles).to.include(\"ADMINISTRADOR\");\n});\n\npm.collectionVariables.set(\"bearer_token_120z\", cuerpo.token);"
                 ]
               }
             }
@@ -101,7 +101,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"nombreUsuario\":\"admin\",\n    \"contrasena\":\"{{contrasena_admin}}\"\n}",
+              "raw": "{\n    \"nombreUsuario\":\"{{tipo_usuario}}\",\n    \"contrasena\":\"{{contrasena_admin}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -124,7 +124,7 @@
           "response": []
         },
         {
-          "name": "api/autenticacion/inicio-sesion-contrasenaincorrecta",
+          "name": "Iniciar sesion con contrasena incorrecta",
           "event": [
             {
               "listen": "test",
@@ -141,7 +141,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"nombreUsuario\":\"admin\",\n    \"contrasena\":\"incorrecta\"\n}\t",
+              "raw": "{\n    \"nombreUsuario\":\"\",\n    \"contrasena\":\"incorrecta\"\n}\t",
               "options": {
                 "raw": {
                   "language": "json"
@@ -164,7 +164,7 @@
           "response": []
         },
         {
-          "name": "api/autenticacion/inicio-sesion-vacio",
+          "name": "Iniciar sesion con cuerpo vacio",
           "event": [
             {
               "listen": "test",
@@ -209,7 +209,7 @@
       "name": "Verificacion",
       "item": [
         {
-          "name": "api/actuator/health",
+          "name": "Consultar estado del backend",
           "event": [
             {
               "listen": "test",
@@ -238,6 +238,1228 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Crear cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));\r\n\r\nconst cuerpo = pm.response.json();\r\n\r\npm.collectionVariables.set(\"cliente_id\", String(cuerpo.id));\r\n\r\nconsole.log(\"ID recibido:\", cuerpo.id);\r\nconsole.log(\"ID guardado:\", pm.environment.get(\"cliente_id\"));\r\n// pm.test(\"Responde 201\", () => pm.response.to.have.status(201));\r\n\r\n// const cuerpo = pm.response.json();\r\n\r\n// pm.test(\"El cliente queda ACTIVO con correo en minusculas\", () => {\r\n//     pm.expect(cuerpo.estado).to.eql(\"ACTIVO\");\r\n//     pm.expect(cuerpo.correo).to.eql(\"ana.gomez@correo.test\");\r\n// });\r\n\r\n// pm.environment.set(\"cliente_id\", cuerpo.id);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"documento_cliente\", String(Math.floor(30000000 + Math.random() * 60000000)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token_120z}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\": \"Ian\",\r\n    \"apellido\": \"David\",\r\n    \"documento\": \"{{documento_cliente}}\",\r\n    \"correo\": \"Ian.David@correo.test\",\r\n    \"telefono\": \"1122336655\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/clientes",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear cliente con documento duplicado",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r\n"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));\r\npm.test(\"Informa el conflicto\", () => pm.expect(pm.response.json().error).to.eql(\"Conflicto\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"Ana\",\r\n    \"apellido\":\"Gomez\",\r\n    \"documento\":\"{{documento_cliente}}\",\r\n    \"correo\":\"Ana.Gomez@correo.test\",\r\n    \"telefono\":\"1155550000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/clientes",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear cliente con datos invalidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));\r\npm.test(\"Informa los cuatro campos invalidos\", () => pm.expect(pm.response.json().detalles).to.have.lengthOf(4));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"\",\r\n    \"apellido\":\"\",\r\n    \"documento\":\"\",\r\n    \"correo\":\"no-es-correo\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/clientes",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dar de baja cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\npm.test(\"Devuelve la pagina de clientes\", () => {\r\n    const cuerpo = pm.response.json();\r\n    pm.expect(cuerpo.contenido).to.be.an(\"array\");\r\n    pm.expect(cuerpo.totalElementos).to.be.at.least(1);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token_120z}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"Momo\",\r\n    \"apellido\":\"Momoapellido\",\r\n    \"documento\":\"1145547896\",\r\n    \"correo\":\"momo.momo@correo.test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/clientes/{{cliente_id}}/baja",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{cliente_id}}",
+                "baja"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar clientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\npm.test(\"Devuelve el cliente creado\", () => pm.expect(pm.response.json().id).to.eql(Number(pm.environment.get(\"cliente_id\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token_120z}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/clientes?texto=Ian&pagina=0&tamano=10",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ],
+              "query": [
+                {
+                  "key": "texto",
+                  "value": "Ian"
+                },
+                {
+                  "key": "pagina",
+                  "value": "0"
+                },
+                {
+                  "key": "tamano",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\npm.test(\"Actualiza el nombre y conserva el documento\", () => {\r\n    const cuerpo = pm.response.json();\r\n    pm.expect(cuerpo.nombre).to.eql(\"Ana Maria\");\r\n    pm.expect(cuerpo.documento).to.eql(pm.environment.get(\"documento_cliente\"));\r\n});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "console.log(\"Environment activo:\", pm.environment.name);\r\nconsole.log(\"ID de entorno:\", pm.environment.get(\"cliente_id\"));\r\nconsole.log(\"ID resuelto:\", pm.variables.get(\"cliente_id\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token_120z}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/clientes/{{cliente_id}}",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{cliente_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar cliente inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\npm.test(\"El cliente queda INACTIVO\", () => pm.expect(pm.response.json().estado).to.eql(\"INACTIVO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/clientes/999999999",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "999999999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar clientes sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));\r\npm.test(\"Usa la estructura de error comun\", () => pm.expect(pm.response.json().error).to.eql(\"No encontrado\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/clientes",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token_120z}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\": \"Ian\",\r\n    \"apellido\": \"David\",\r\n    \"correo\": \"ian.david@correo.com\",\r\n    \"telefono\": \"1122336655\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/clientes/{{cliente_id}}",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{cliente_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auditoria",
+      "item": [
+        {
+          "name": "Consultar auditoria de un cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));\r\npm.test(\"Informa los cuatro campos invalidos\", () => pm.expect(pm.response.json().detalles).to.have.lengthOf(4));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token_120z}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"\",\r\n    \"apellido\":\"\",\r\n    \"documento\":\"\",\r\n    \"correo\":\"no-es-correo\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/auditoria?entidad=CLIENTE&idRegistro={{cliente_id}}",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "auditoria"
+              ],
+              "query": [
+                {
+                  "key": "entidad",
+                  "value": "CLIENTE"
+                },
+                {
+                  "key": "idRegistro",
+                  "value": "{{cliente_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar auditoria de una cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\n\r\npm.test(\"Registra creacion, bloqueo, desbloqueo y baja logica\", () => {\r\n    const acciones = pm.response.json().map(evento => evento.accion);\r\n    pm.expect(acciones).to.have.lengthOf(4);\r\n    pm.expect(acciones).to.include.members([\"CREACION\", \"MODIFICACION\", \"BAJA_LOGICA\"]);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "GET {{url_base}}/api/auditoria?entidad=CUENTA&idRegistro={{cuenta_id}}",
+              "host": [
+                "GET {{url_base}}"
+              ],
+              "path": [
+                "api",
+                "auditoria"
+              ],
+              "query": [
+                {
+                  "key": "entidad",
+                  "value": "CUENTA"
+                },
+                {
+                  "key": "idRegistro",
+                  "value": "{{cuenta_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar auditoria de un usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\n\r\npm.test(\"Registra creacion y las modificaciones\", () => {\r\n    const acciones = pm.response.json().map(evento => evento.accion);\r\n    pm.expect(acciones).to.have.lengthOf(3);\r\n    pm.expect(acciones).to.include.members([\"CREACION\", \"MODIFICACION\"]);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "GET {{url_base}}/api/auditoria?entidad=USUARIO&idRegistro={{usuario_id}}",
+              "host": [
+                "GET {{url_base}}"
+              ],
+              "path": [
+                "api",
+                "auditoria"
+              ],
+              "query": [
+                {
+                  "key": "entidad",
+                  "value": "USUARIO"
+                },
+                {
+                  "key": "idRegistro",
+                  "value": "{{usuario_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cuentas",
+      "item": [
+        {
+          "name": "Crear cliente para cuentas",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"documento_cuentas\", String(Math.floor(30000000 + Math.random() * 60000000)));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));\r\npm.environment.set(\"cliente_cuentas_id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"Beto\",\r\n    \"apellido\":\"Cuentas\",\r\n    \"documento\":\"{{documento_cuentas}}\",\r\n    \"correo\":\"beto@correo.test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/clientes",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));\r\n\r\nconst cuerpo = pm.response.json();\r\n\r\npm.test(\"Numero generado, saldo cero y cuenta ACTIVA\", () => {\r\n    pm.expect(cuerpo.numeroCuenta).to.match(/^CA-\\d{10}$/);\r\n    pm.expect(cuerpo.saldo).to.eql(0);\r\n    pm.expect(cuerpo.estado).to.eql(\"ACTIVA\");\r\n});\r\n\r\npm.environment.set(\"cuenta_id\", cuerpo.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"idCliente\":{{cliente_cuentas_id}},\r\n    \"tipoCuenta\":\"CAJA_AHORRO\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/clientes",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear cuenta con tipo invalido",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"idCliente\":{{cliente_cuentas_id}},\r\n    \"tipoCuenta\":\"INEXISTENTE\"\r\n}\t",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/clientes",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar cuentas del cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/cuentas?idCliente={{cliente_cuentas_id}}",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "cuentas"
+              ],
+              "query": [
+                {
+                  "key": "idCliente",
+                  "value": "{{cliente_cuentas_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar cuenta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/cuentas/{{cuenta_id}}",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "cuentas",
+                "{{cuenta_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bloquear cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\npm.test(\"La cuenta queda BLOQUEADA\", () => pm.expect(pm.response.json().estado).to.eql(\"BLOQUEADA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/cuentas/{{cuenta_id}}/bloqueo",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "cuentas",
+                "{{cuenta_id}}",
+                "bloqueo"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Desbloquear cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\npm.test(\"La cuenta queda ACTIVA\", () => pm.expect(pm.response.json().estado).to.eql(\"ACTIVA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/cuentas/{{cuenta_id}}/desbloqueo",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "cuentas",
+                "{{cuenta_id}}",
+                "desbloqueo"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dar de baja cliente con cuenta abierta",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/clientes/{{cliente_cuentas_id}}/baja",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{cliente_cuentas_id}}",
+                "baja"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cerrar cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\npm.test(\"La cuenta queda CERRADA\", () => pm.expect(pm.response.json().estado).to.eql(\"CERRADA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/cuentas/{{cuenta_id}}/baja",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "cuentas",
+                "{{cuenta_id}}",
+                "baja"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bloquear cuenta cerrada",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/cuentas/{{cuenta_id}}/bloqueo",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "cuentas",
+                "{{cuenta_id}}",
+                "bloqueo"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dar de baja cliente con cuentas cerradas",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/clientes/{{cliente_cuentas_id}}/baja",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{cliente_cuentas_id}}",
+                "baja"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Crear usuario operador",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const sufijo = Date.now().toString().slice(-6);\r\npm.environment.set(\"usuario_operador\", \"operador\" + sufijo);\r\npm.environment.set(\"contrasena_operador\", \"Op-\" + Date.now() + \"-Clave\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));\r\n\r\nconst cuerpo = pm.response.json();\r\n\r\npm.test(\"No expone la contrasena\", () => {\r\n    pm.expect(cuerpo).to.not.have.property(\"contrasena\");\r\n    pm.expect(cuerpo).to.not.have.property(\"contrasenaHash\");\r\n});\r\n\r\npm.test(\"El usuario queda ACTIVO con rol OPERADOR\", () => {\r\n    pm.expect(cuerpo.estado).to.eql(\"ACTIVO\");\r\n    pm.expect(cuerpo.roles).to.eql([\"OPERADOR\"]);\r\n});\r\n\r\npm.environment.set(\"usuario_id\", cuerpo.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"Olga\",\r\n    \"apellido\":\"Operadora\",\r\n    \"correo\":\"{{usuario_operador}}@correo.test\",\r\n    \"nombreUsuario\":\"{{usuario_operador}}\",\r\n    \"contrasena\":\"{{contrasena_operador}}\",\r\n    \"roles\":[\"OPERADOR\"]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/usuarios",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear usuario con nombre duplicado",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"Olga\",\r\n    \"apellido\":\"Operadora\",\r\n    \"correo\":\"{{usuario_operador}}@correo.test\",\r\n    \"nombreUsuario\":\"{{usuario_operador}}\",\r\n    \"contrasena\":\"{{contrasena_operador}}\",\r\n    \"roles\":[\"OPERADOR\"]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/usuarios",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear usuario con datos invalidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));\r\npm.test(\"Informa los seis campos invalidos\", () => pm.expect(pm.response.json().detalles).to.have.lengthOf(6));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"\",\r\n    \"apellido\":\"\",\r\n    \"correo\":\"x\",\r\n    \"nombreUsuario\":\"a\",\r\n    \"contrasena\":\"corta\",\"roles\":[]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/usuarios",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/usuarios?texto=operador",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "key": "texto",
+                  "value": "operador"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar usuario",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/usuarios/{{usuario_id}}",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuario_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"Olga Maria\",\r\n    \"apellido\":\"Operadora\",\r\n    \"correo\":\"{{usuario_operador}}@correo.test\",\r\n    \"roles\":[\"OPERADOR\"]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/usuarios/{{usuario_id}}",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuario_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Iniciar sesion como el usuario creado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\n\r\nconst cuerpo = pm.response.json();\r\npm.test(\"El token es de un OPERADOR\", () => pm.expect(cuerpo.roles).to.eql([\"OPERADOR\"]));\r\n\r\npm.environment.set(\"token_operador\", cuerpo.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombreUsuario\":\"{{usuario_operador}}\",\r\n    \"contrasena\":\"{{contrasena_operador}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/autenticacion/inicio-sesion",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "autenticacion",
+                "inicio-sesion"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Operador no puede crear clientes",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombre\":\"X\",\r\n    \"apellido\":\"Y\",\r\n    \"documento\":\"12345678\",\r\n    \"correo\":\"x@correo.test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/clientes, Bearer {{token_operador}}",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes, Bearer {{token_operador}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Operador puede listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_base}}/api/clientes, Bearer {{token_operador}}",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "clientes, Bearer {{token_operador}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar estado de usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));\r\npm.test(\"El usuario queda BLOQUEADO\", () => pm.expect(pm.response.json().estado).to.eql(\"BLOQUEADO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"estado\":\"BLOQUEADO\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/usuarios/{{usuario_id}}/estado",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuario_id}}",
+                "estado"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Iniciar sesion con usuario bloqueado",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nombreUsuario\":\"{{usuario_operador}}\",\r\n    \"contrasena\":\"{{contrasena_operador}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_base}}/api/autenticacion/inicio-sesion",
+              "host": [
+                "{{url_base}}"
+              ],
+              "path": [
+                "api",
+                "autenticacion",
+                "inicio-sesion"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -246,8 +1468,24 @@
       "value": ""
     },
     {
-      "key": "token",
+      "key": "bearer_token_120z",
       "secret": true
+    },
+    {
+      "key": "tipo_usuario",
+      "value": ""
+    },
+    {
+      "key": "contrasena_admin",
+      "value": ""
+    },
+    {
+      "key": "bearer_token_18au",
+      "secret": true
+    },
+    {
+      "key": "cliente_id",
+      "value": ""
     }
   ]
 }
