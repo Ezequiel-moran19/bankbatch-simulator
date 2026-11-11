@@ -1,0 +1,3 @@
+CREATE SEQUENCE seq_numero_cuenta START WITH 1 INCREMENT BY 1 NO CYCLE;
+
+GRANT USAGE, SELECT ON SEQUENCE seq_numero_cuenta TO bankbatch_app;

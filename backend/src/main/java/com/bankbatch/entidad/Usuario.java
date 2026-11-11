@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -54,15 +55,16 @@ public class Usuario {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "usuarios_roles",
-            joinColumns = @JoinColumn(name = "id_usuario"),
-            inverseJoinColumns = @JoinColumn(name = "id_rol"))
+        name = "usuarios_roles",
+        joinColumns = @JoinColumn(name = "id_usuario"),
+        inverseJoinColumns = @JoinColumn(name = "id_rol"))
     private Set<Rol> roles = new HashSet<>();
 
     protected Usuario() {
     }
 
-    public Usuario(String nombre, String apellido, String correo, String nombreUsuario, String contrasenaHash) {
+    public Usuario(String nombre, String apellido, String correo,
+                   String nombreUsuario, String contrasenaHash) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo.strip().toLowerCase(Locale.ROOT);
@@ -76,12 +78,32 @@ public class Usuario {
         return estado == EstadoUsuario.ACTIVO;
     }
 
+    public boolean tieneRol(String nombreRol) {
+        return roles.stream()
+            .anyMatch(rol -> rol.getNombre().equals(nombreRol));
+    }
+
     public void registrarAcceso(Instant momento) {
         this.ultimoAcceso = momento;
     }
 
     public void agregarRol(Rol rol) {
         this.roles.add(rol);
+    }
+
+    public void actualizarDatos(String nombre, String apellido, String correo) {
+        this.nombre = nombre.strip();
+        this.apellido = apellido.strip();
+        this.correo = correo.strip().toLowerCase(Locale.ROOT);
+    }
+
+    public void reemplazarRoles(List<Rol> nuevosRoles) {
+        this.roles.clear();
+        this.roles.addAll(nuevosRoles);
+    }
+
+    public void cambiarEstado(EstadoUsuario nuevoEstado) {
+        this.estado = nuevoEstado;
     }
 
     public Long getId() {

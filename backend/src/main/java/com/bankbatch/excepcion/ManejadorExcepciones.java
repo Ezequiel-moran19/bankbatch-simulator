@@ -49,6 +49,12 @@ public class ManejadorExcepciones {
             "El parámetro '" + excepcion.getName() + "' tiene un valor inválido", solicitud, List.of());
     }
 
+    @ExceptionHandler(SolicitudInvalidaExcepcion.class)
+    public ResponseEntity<RespuestaError> solicitudInvalida(SolicitudInvalidaExcepcion excepcion,
+                                                            HttpServletRequest solicitud) {
+        return responder(HttpStatus.BAD_REQUEST, "Solicitud incorrecta", excepcion.getMessage(), solicitud, List.of());
+    }
+
     @ExceptionHandler(RecursoNoEncontradoExcepcion.class)
     public ResponseEntity<RespuestaError> recursoNoEncontrado(RecursoNoEncontradoExcepcion excepcion,
                                                               HttpServletRequest solicitud) {
