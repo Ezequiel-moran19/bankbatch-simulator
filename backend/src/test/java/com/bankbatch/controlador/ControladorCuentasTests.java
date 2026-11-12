@@ -151,7 +151,8 @@ class ControladorCuentasTests {
                         .header(HttpHeaders.AUTHORIZATION, bearer(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cuerpoCuenta(idCliente, "INEXISTENTE")))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").value(org.hamcrest.Matchers.containsString("CAJA_AHORRO")));
     }
 
     @Test
