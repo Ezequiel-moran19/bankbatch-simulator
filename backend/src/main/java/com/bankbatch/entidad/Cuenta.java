@@ -82,6 +82,28 @@ public class Cuenta {
         this.estado = EstadoCuenta.CERRADA;
     }
 
+    public void acreditar(BigDecimal importe) {
+        validarOperable(importe);
+        this.saldo = saldo.add(importe);
+    }
+
+    public void debitar(BigDecimal importe) {
+        validarOperable(importe);
+        if (saldo.compareTo(importe) < 0) {
+            throw new IllegalStateException("Saldo insuficiente");
+        }
+        this.saldo = saldo.subtract(importe);
+    }
+
+    private void validarOperable(BigDecimal importe) {
+        if (estado != EstadoCuenta.ACTIVA) {
+            throw new IllegalStateException("Solo una cuenta ACTIVA admite movimientos");
+        }
+        if (importe == null || importe.signum() <= 0) {
+            throw new IllegalArgumentException("El importe debe ser mayor que cero");
+        }
+    }
+
     public Long getId() {
         return id;
     }

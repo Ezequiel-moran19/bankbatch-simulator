@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import tools.jackson.databind.exc.InvalidFormatException;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.time.Instant;
 import java.util.List;
 
@@ -38,8 +42,15 @@ public class ManejadorExcepciones {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<RespuestaError> cuerpoIlegible(HttpMessageNotReadableException excepcion,
                                                          HttpServletRequest solicitud) {
-        return responder(HttpStatus.BAD_REQUEST, "Solicitud incorrecta",
-            "El cuerpo de la solicitud falta o no tiene un formato válido", solicitud, List.of());
+        String mensaje = "El cuerpo de la solicitud falta o no tiene un formato válido";
+        if (excepcion.getCause() instanceof InvalidFormatException formato
+            && formato.getTargetType() != null && formato.getTargetType().isEnum()) {
+            String admitidos = Arrays.stream(formato.getTargetType().getEnumConstants())
+                .map(Object::toString)
+                .collect(Collectors.joining(", "));
+            mensaje = "El valor '" + formato.getValue() + "' no es válido. Valores admitidos: " + admitidos;
+        }
+        return responder(HttpStatus.BAD_REQUEST, "Solicitud incorrecta", mensaje, solicitud, List.of());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -78,6 +89,13 @@ public class ManejadorExcepciones {
                                                            HttpServletRequest solicitud) {
         return responder(HttpStatus.CONFLICT, "Conflicto",
             "La operación entra en conflicto con datos existentes", solicitud, List.of());
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<RespuestaError> conflictoDeConcurrencia(ObjectOptimisticLockingFailureException excepcion,
+                                                                  HttpServletRequest solicitud) {
+        return responder(HttpStatus.CONFLICT, "Conflicto",
+            "La cuenta fue modificada por otra operación; reintente", solicitud, List.of());
     }
 
     private ResponseEntity<RespuestaError> responder(HttpStatus estado, String error, String mensaje,
